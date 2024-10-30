@@ -1,3 +1,5 @@
+# Assessment started
+
 # oig-assessment
 Coding assessment for new developers @ OIG
 
