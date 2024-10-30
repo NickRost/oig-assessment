@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using OIG.Survey.Data;
+using OIG.Survey.DLL.Models;
 
 namespace OIG.Survey.Components.Account
 {

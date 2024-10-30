@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using OIG.Survey.Components.Account.Pages;
 using OIG.Survey.Components.Account.Pages.Manage;
-using OIG.Survey.Data;
+using OIG.Survey.DLL.Models;
 using System.Security.Claims;
 using System.Text.Json;
 

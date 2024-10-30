@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Server;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using OIG.Survey.Data;
+using OIG.Survey.DLL.Models;
 using System.Security.Claims;
 
 namespace OIG.Survey.Components.Account

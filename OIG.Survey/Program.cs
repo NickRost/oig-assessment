@@ -3,7 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OIG.Survey.Components;
 using OIG.Survey.Components.Account;
-using OIG.Survey.Data;
+using OIG.Survey.DLL;
+using OIG.Survey.DLL.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 

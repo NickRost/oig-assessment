@@ -4,6 +4,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OIG.Survey", "OIG.Survey\OIG.Survey.csproj", "{4AE2A164-70C5-4EB2-AF65-1E7CBEB02FF5}"
+	ProjectSection(ProjectDependencies) = postProject
+		{03132182-C26A-4C64-9A92-2E807AF76AAF} = {03132182-C26A-4C64-9A92-2E807AF76AAF}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OIG.Survey.BLL", "OIG.Survey.BLL\OIG.Survey.BLL.csproj", "{3A07B993-4349-4B8F-BBCF-BC0702ADAB9A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OIG.Survey.DLL", "OIG.Survey.DLL\OIG.Survey.DLL.csproj", "{03132182-C26A-4C64-9A92-2E807AF76AAF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +22,14 @@ Global
 		{4AE2A164-70C5-4EB2-AF65-1E7CBEB02FF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4AE2A164-70C5-4EB2-AF65-1E7CBEB02FF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4AE2A164-70C5-4EB2-AF65-1E7CBEB02FF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A07B993-4349-4B8F-BBCF-BC0702ADAB9A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A07B993-4349-4B8F-BBCF-BC0702ADAB9A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A07B993-4349-4B8F-BBCF-BC0702ADAB9A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A07B993-4349-4B8F-BBCF-BC0702ADAB9A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03132182-C26A-4C64-9A92-2E807AF76AAF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03132182-C26A-4C64-9A92-2E807AF76AAF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03132182-C26A-4C64-9A92-2E807AF76AAF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03132182-C26A-4C64-9A92-2E807AF76AAF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
