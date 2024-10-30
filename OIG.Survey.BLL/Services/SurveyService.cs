@@ -20,9 +20,57 @@ namespace OIG.Survey.BLL.Services
 
         public async Task<List<SurveySession>> GetSurveys()
         {
-            var surveysList = _surveyContext.SurveySessions.ToListAsync();
+            return await _surveyContext.SurveySessions.ToListAsync();
+        }
 
-            return null;
+        public async Task<SurveySession> GetSurveyById(Guid id)
+        {
+            return await _surveyContext.SurveySessions.FindAsync(id);
+        }
+
+        public async Task CreateSurvey(SurveySession survey)
+        {
+            _surveyContext.SurveySessions.Add(survey);
+            await _surveyContext.SaveChangesAsync();
+        }
+
+        public async Task<bool> UpdateSurvey(SurveySession survey)
+        {
+            _surveyContext.Entry(survey).State = EntityState.Modified;
+            try
+            {
+                await _surveyContext.SaveChangesAsync();
+                return true;
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!SurveyExists(survey.Id))
+                {
+                    return false;
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
+
+        public async Task<bool> DeleteSurvey(Guid id)
+        {
+            var survey = await _surveyContext.SurveySessions.FindAsync(id);
+            if (survey == null)
+            {
+                return false;
+            }
+
+            _surveyContext.SurveySessions.Remove(survey);
+            await _surveyContext.SaveChangesAsync();
+            return true;
+        }
+
+        private bool SurveyExists(Guid id)
+        {
+            return _surveyContext.SurveySessions.Any(e => e.Id == id);
         }
     }
 }

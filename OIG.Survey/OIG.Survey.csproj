@@ -15,6 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\OIG.Survey.BLL\OIG.Survey.BLL.csproj" />
     <ProjectReference Include="..\OIG.Survey.DLL\OIG.Survey.DLL.csproj" />
   </ItemGroup>
 
