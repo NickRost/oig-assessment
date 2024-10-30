@@ -3,14 +3,14 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35312.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OIG.Survey", "OIG.Survey\OIG.Survey.csproj", "{4AE2A164-70C5-4EB2-AF65-1E7CBEB02FF5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OIG.Survey", "OIG.Survey\OIG.Survey.csproj", "{4AE2A164-70C5-4EB2-AF65-1E7CBEB02FF5}"
 	ProjectSection(ProjectDependencies) = postProject
 		{03132182-C26A-4C64-9A92-2E807AF76AAF} = {03132182-C26A-4C64-9A92-2E807AF76AAF}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OIG.Survey.BLL", "OIG.Survey.BLL\OIG.Survey.BLL.csproj", "{3A07B993-4349-4B8F-BBCF-BC0702ADAB9A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OIG.Survey.BLL", "OIG.Survey.BLL\OIG.Survey.BLL.csproj", "{3A07B993-4349-4B8F-BBCF-BC0702ADAB9A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OIG.Survey.DLL", "OIG.Survey.DLL\OIG.Survey.DLL.csproj", "{03132182-C26A-4C64-9A92-2E807AF76AAF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OIG.Survey.DLL", "OIG.Survey.DLL\OIG.Survey.DLL.csproj", "{03132182-C26A-4C64-9A92-2E807AF76AAF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

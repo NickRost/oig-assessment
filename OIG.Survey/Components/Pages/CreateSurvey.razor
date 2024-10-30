@@ -1,0 +1,53 @@
+﻿@page "/create-survey"
+@using OIG.Survey.BLL.Services
+@using OIG.Survey.DLL.Models
+@inject SurveyService SurveyService
+@inject NavigationManager NavigationManager
+
+<PageTitle>Create Survey</PageTitle>
+
+<h1>Create Survey</h1>
+
+<EditForm Model="newSurvey" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="startDate" class="form-label">Start Date</label>
+        <InputDate Type="InputDateType.DateTimeLocal" id="startDate" class="form-control" @bind-Value="newSurvey.StartDate" />
+    </div>
+    <div class="mb-3">
+        <label for="endDate" class="form-label">End Date</label>
+        <InputDate Type="InputDateType.DateTimeLocal" id="endDate" class="form-control" @bind-Value="newSurvey.EndDate" />
+    </div>
+    <div class="mb-3">
+        <label for="status" class="form-label">Status</label>
+        <InputSelect id="status" class="form-control" @bind-Value="newSurvey.Status">
+            @foreach (var status in Enum.GetValues<SurveyStatus>())
+            {
+                <option value="@status">@status</option>
+            }
+        </InputSelect>
+    </div>
+@*     <div class="mb-3">
+        <label for="owner" class="form-label">Owner</label>
+        <InputText id="owner" class="form-control" @bind-Value="newSurvey.Owner.UserName" />
+    </div> *@
+    <button type="submit" class="btn btn-primary">Create</button>
+</EditForm>
+
+@code {
+    private SurveySession newSurvey = new SurveySession
+        {
+            StartDate = DateTime.Now.AddDays(1),
+            EndDate = DateTime.Now.AddDays(7),
+            Status = SurveyStatus.Concept,
+            //Owner = new User { UserName = "defaultUser" } 
+        };
+
+    private async Task HandleValidSubmit()
+    {
+        await SurveyService.CreateSurvey(newSurvey);
+        NavigationManager.NavigateTo("/survey-list");
+    }
+}
