@@ -56,7 +56,7 @@
 
     @if (showEndDateError)
     {
-        <div class="text-danger">End Date cannot be earlier than the Start Date.</div>
+        <div class="text-danger">End Date must be at least 1 hour after the Start Date.</div>
     }
 
     <button type="submit" class="btn btn-primary">Schedule</button>
@@ -71,7 +71,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        surveys = await SurveyService.GetSurveys();
+        var allSurveys = await SurveyService.GetSurveys();
+        surveys = allSurveys.Where(s => s.Status == SurveyStatus.Concept || s.Status == SurveyStatus.Scheduled).ToList();
         users = await UserService.GetUsers();
         if (surveys.Any())
         {
@@ -94,7 +95,7 @@
             return;
         }
 
-        if (scheduleModel.EndDate < scheduleModel.StartDate)
+        if (scheduleModel.EndDate < scheduleModel.StartDate.AddHours(1))
         {
             showEndDateError = true;
             return;

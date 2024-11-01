@@ -53,7 +53,6 @@ else
           AllowPaging="true"
           PageSize="10"
           AllowSorting="true"
-          AllowSelection="true"
           OnRowClick="OnRowClick"
           Responsive="true">
 
@@ -151,6 +150,6 @@ else
         var parameters = dictionary;
         parameters.Add("SurveyId", args.Item.Id);
         parameters.Add("OnclickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, OnHideModalClick));
-        await modal2.ShowAsync<EmployeeDemoComponent1>("Employee Details", null, parameters);
+        await modal2.ShowAsync<EditSurveyModal>("Employee Details", null, parameters);
     }
 }

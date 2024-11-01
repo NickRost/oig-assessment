@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using OIG.Survey.BLL.Interfaces;
 using OIG.Survey.DLL;
 using OIG.Survey.DLL.Models;
 using System;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace OIG.Survey.BLL.Services
 {
-    public class SurveyService
+    public class SurveyService : ISurveyService
     {
         private readonly ApplicationDbContext _surveyContext;
 

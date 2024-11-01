@@ -2,6 +2,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using OIG.Survey.BLL.Services
 @using OIG.Survey.DLL.Models
+@using System.Security.Claims
 @inject SurveyService SurveyService
 @inject NavigationManager NavigationManager
 
@@ -99,10 +100,19 @@
     private async Task HandleValidSubmit()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var user = authState.User;
+
+        // Extract UserId from the claims
+        var userId = user.FindFirst(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+
+        if (string.IsNullOrEmpty(userId))
+        {
+            throw new Exception("User is not authenticated.");
+        }
         newSurvey.StartDate = DateTime.Now.AddYears(1);
         newSurvey.EndDate = DateTime.Now.AddYears(1);
         newSurvey.Status = SurveyStatus.Concept;
-        newSurvey.OwnerId = "d86da734-6db3-4b23-849a-4e70fbff9e14";
+        newSurvey.OwnerId = userId;
         await SurveyService.CreateSurvey(newSurvey);
         NavigationManager.NavigateTo("/survey-list");
     }

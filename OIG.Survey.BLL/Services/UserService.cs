@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace OIG.Survey.BLL.Services
 {
-    public class UserService
+    public class UserService : IUserService
     {
         private readonly ApplicationDbContext _context;
 
