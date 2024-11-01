@@ -1,0 +1,145 @@
+﻿@page "/my-surveys"
+@using OIG.Survey.BLL.Services
+@using OIG.Survey.DLL.Models
+@attribute [StreamRendering]
+@rendermode InteractiveServer
+
+<PageTitle>My Surveys</PageTitle>
+
+<h1>My Surveys</h1>
+
+@if (surveys == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <Grid TItem="SurveySession"
+          Class="table table-hover table-bordered table-striped"
+          AllowRowClick="true"
+          DataProvider="SurveysDataProvider"
+          AllowFiltering="true"
+          AllowPaging="true"
+          PageSize="10"
+          AllowSorting="true"
+          AllowSelection="true"
+          OnRowClick="OnRowClick"
+          Responsive="true">
+
+        <GridColumns>
+            <GridColumn TItem="SurveySession" HeaderText="Name" PropertyName="Name" SortString="Name" SortKeySelector="item => item.Name">
+                @context.Name
+            </GridColumn>
+
+            <GridColumn TItem="SurveySession" HeaderText="StartDate" PropertyName="StartDate" SortKeySelector="item => item.StartDate">
+                @context.StartDate
+            </GridColumn>
+
+            <GridColumn TItem="SurveySession" HeaderText="EndDate" PropertyName="EndDate" SortKeySelector="item => item.EndDate">
+                @context.EndDate
+            </GridColumn>
+
+            <GridColumn TItem="SurveySession" HeaderText="Status" PropertyName="Status">
+                @context.Status
+            </GridColumn>
+        </GridColumns>
+    </Grid>
+}
+
+<Modal @ref="modal" Title="Answer Survey Question">
+    <BodyTemplate>
+        <div>
+            <label for="question">Question:</label>
+            <p id="question">@questionText</p>
+        </div>
+        <div>
+            <label for="answer">Answer:</label>
+            <input type="text" id="answer" @bind="answer" class="form-control" />
+        </div>
+    </BodyTemplate>
+    <FooterTemplate>
+        <button class="btn btn-primary" @onclick="SubmitAnswer">Submit</button>
+        <button class="btn btn-secondary" @onclick="HideModal">Close</button>
+    </FooterTemplate>
+</Modal>
+
+@code {
+    private List<SurveySession>? surveys;
+    private SurveySession? selectedSurvey;
+    private string answer = string.Empty;
+    private string questionText = string.Empty;
+
+    [Inject]
+    private SurveyService SurveyService { get; set; }
+
+    [Inject]
+    private IJSRuntime JSRuntime { get; set; }
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; }
+
+    [Inject]
+    private AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+
+    private Modal modal = default!;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        var userEmail = authState.User.Identity.Name;
+
+        if (userEmail != null)
+        {
+            surveys = await SurveyService.GetSurveysByAssignedUserEmail(userEmail);
+        }
+    }
+
+    private async Task<GridDataProviderResult<SurveySession>> SurveysDataProvider(GridDataProviderRequest<SurveySession> request)
+    {
+        return await Task.FromResult(request.ApplyTo(surveys));
+    }
+
+    private async Task OnRowClick(GridRowEventArgs<SurveySession> args)
+    {
+        selectedSurvey = args.Item;
+
+        if (selectedSurvey.Status == SurveyStatus.Active)
+        {
+            questionText = selectedSurvey.Questions.First().QuestionText; // Assuming one question for simplicity
+            await modal.ShowAsync();
+        }
+        else
+        {
+            await JSRuntime.InvokeVoidAsync("alert", "You can only answer questions for active surveys.");
+        }
+    }
+
+    private async Task SubmitAnswer()
+    {
+        if (selectedSurvey != null)
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            var userId = user.FindFirst(c => c.Type == "sub")?.Value;
+
+            if (userId != null)
+            {
+                var userAnswer = new UserAnswer
+                    {
+                        UserId = userId,
+                        SurveySessionId = selectedSurvey.Id,
+                        SurveyQuestionId = selectedSurvey.Questions.First().Id, // Assuming one question for simplicity
+                        Answer = answer
+                    };
+
+                await SurveyService.SubmitAnswer(userAnswer);
+                await modal.HideAsync();
+            }
+        }
+    }
+
+    private async Task HideModal()
+    {
+        await modal.HideAsync();
+    }
+}

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OIG.Survey.DLL;
 
@@ -11,9 +12,11 @@ using OIG.Survey.DLL;
 namespace OIG.Survey.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241031141600_AddSurvey")]
+    partial class AddSurvey
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -226,9 +229,6 @@ namespace OIG.Survey.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("AssignedUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
@@ -236,8 +236,10 @@ namespace OIG.Survey.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("OwnerId")
-                        .IsRequired()
+                    b.Property<Guid>("OwnerId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("OwnerId1")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("StartDate")
@@ -248,9 +250,7 @@ namespace OIG.Survey.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssignedUserId");
-
-                    b.HasIndex("OwnerId");
+                    b.HasIndex("OwnerId1");
 
                     b.ToTable("SurveySessions");
                 });
@@ -260,6 +260,10 @@ namespace OIG.Survey.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Options")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("QuestionText")
                         .IsRequired()
@@ -328,18 +332,9 @@ namespace OIG.Survey.Migrations
 
             modelBuilder.Entity("OIG.Survey.DLL.Models.SurveySession", b =>
                 {
-                    b.HasOne("OIG.Survey.DLL.Models.ApplicationUser", "AssignedUser")
-                        .WithMany("AssignedSurveys")
-                        .HasForeignKey("AssignedUserId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("OIG.Survey.DLL.Models.ApplicationUser", "Owner")
-                        .WithMany("OwnedSurveys")
-                        .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("AssignedUser");
+                        .WithMany()
+                        .HasForeignKey("OwnerId1");
 
                     b.Navigation("Owner");
                 });
@@ -349,13 +344,6 @@ namespace OIG.Survey.Migrations
                     b.HasOne("OIG.Survey.DLL.Models.SurveySession", null)
                         .WithMany("Questions")
                         .HasForeignKey("SurveySessionId");
-                });
-
-            modelBuilder.Entity("OIG.Survey.DLL.Models.ApplicationUser", b =>
-                {
-                    b.Navigation("AssignedSurveys");
-
-                    b.Navigation("OwnedSurveys");
                 });
 
             modelBuilder.Entity("OIG.Survey.DLL.Models.SurveySession", b =>

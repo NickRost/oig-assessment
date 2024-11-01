@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using OIG.Survey.DLL;
 
@@ -11,9 +12,11 @@ using OIG.Survey.DLL;
 namespace OIG.Survey.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241031171404_AddOwner")]
+    partial class AddOwner
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -226,9 +229,6 @@ namespace OIG.Survey.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("AssignedUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
@@ -247,8 +247,6 @@ namespace OIG.Survey.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AssignedUserId");
 
                     b.HasIndex("OwnerId");
 
@@ -328,18 +326,11 @@ namespace OIG.Survey.Migrations
 
             modelBuilder.Entity("OIG.Survey.DLL.Models.SurveySession", b =>
                 {
-                    b.HasOne("OIG.Survey.DLL.Models.ApplicationUser", "AssignedUser")
-                        .WithMany("AssignedSurveys")
-                        .HasForeignKey("AssignedUserId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
                     b.HasOne("OIG.Survey.DLL.Models.ApplicationUser", "Owner")
-                        .WithMany("OwnedSurveys")
+                        .WithMany()
                         .HasForeignKey("OwnerId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("AssignedUser");
 
                     b.Navigation("Owner");
                 });
@@ -349,13 +340,6 @@ namespace OIG.Survey.Migrations
                     b.HasOne("OIG.Survey.DLL.Models.SurveySession", null)
                         .WithMany("Questions")
                         .HasForeignKey("SurveySessionId");
-                });
-
-            modelBuilder.Entity("OIG.Survey.DLL.Models.ApplicationUser", b =>
-                {
-                    b.Navigation("AssignedSurveys");
-
-                    b.Navigation("OwnedSurveys");
                 });
 
             modelBuilder.Entity("OIG.Survey.DLL.Models.SurveySession", b =>

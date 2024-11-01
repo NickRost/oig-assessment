@@ -1,0 +1,55 @@
+﻿@using OIG.Survey.BLL.Services
+@using OIG.Survey.DLL.Models
+@inject NavigationManager NavigationManager
+<EditForm FormName="create" Model="surveySession" OnValidSubmit="HandleValidSubmit" >
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="name" class="form-label">Survey Name</label>
+        <InputText id="name" class="form-control" @bind-Value="surveySession!.Name" />
+    </div>
+    <div class="mb-3">
+        <label for="startDate" class="form-label">Start Date</label>
+        <InputDate Type="InputDateType.DateTimeLocal" id="startDate" class="form-control" @bind-Value="surveySession!.StartDate" />
+    </div>
+    <div class="mb-3">
+        <label for="endDate" class="form-label">End Date</label>
+        <InputDate Type="InputDateType.DateTimeLocal" id="endDate" class="form-control" @bind-Value="surveySession!.EndDate" />
+    </div>
+    <div class="mb-3">
+        <label for="status" class="form-label">Status</label>
+        <InputSelect id="status" class="form-control" @bind-Value="surveySession!.Status">
+            @foreach (var status in Enum.GetValues<SurveyStatus>())
+            {
+                <option value="@status">@status</option>
+            }
+        </InputSelect>
+    </div>
+    <button type="submit" class="btn btn-primary">Update</button>
+</EditForm>
+@code {
+
+    private SurveySession surveySession = new SurveySession();
+
+    [Parameter] public Guid SurveyId { get; set; }
+
+    [Parameter] public EventCallback<MouseEventArgs> OnClickCallback { get; set; }
+
+    [Inject] private SurveyService SurveyService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        surveySession = await SurveyService.GetSurveyById(SurveyId);
+        base.OnInitialized();
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        await SurveyService.UpdateSurvey(surveySession);
+        await OnClickCallback.InvokeAsync(new MouseEventArgs());
+        NavigationManager.NavigateTo("/survey-list");
+        
+
+    }
+}

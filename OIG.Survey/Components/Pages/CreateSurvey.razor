@@ -1,52 +1,108 @@
 ﻿@page "/create-survey"
+@using Microsoft.AspNetCore.Authorization
 @using OIG.Survey.BLL.Services
 @using OIG.Survey.DLL.Models
 @inject SurveyService SurveyService
 @inject NavigationManager NavigationManager
 
+@attribute [Authorize]
+
 <PageTitle>Create Survey</PageTitle>
 
 <h1>Create Survey</h1>
 
-<EditForm Model="newSurvey" OnValidSubmit="HandleValidSubmit">
+<EditForm FormName="create" Model="newSurvey" OnValidSubmit="HandleValidSubmit">
     <DataAnnotationsValidator />
     <ValidationSummary />
 
     <div class="mb-3">
+        <label for="name" class="form-label">Survey Name</label>
+        <InputText id="name" class="form-control" @bind-Value="newSurvey!.Name" />
+    </div>
+@*     <div class="mb-3">
         <label for="startDate" class="form-label">Start Date</label>
-        <InputDate Type="InputDateType.DateTimeLocal" id="startDate" class="form-control" @bind-Value="newSurvey.StartDate" />
+        <InputDate Type="InputDateType.DateTimeLocal" id="startDate" class="form-control" @bind-Value="newSurvey!.StartDate" />
     </div>
     <div class="mb-3">
         <label for="endDate" class="form-label">End Date</label>
-        <InputDate Type="InputDateType.DateTimeLocal" id="endDate" class="form-control" @bind-Value="newSurvey.EndDate" />
-    </div>
-    <div class="mb-3">
+        <InputDate Type="InputDateType.DateTimeLocal" id="endDate" class="form-control" @bind-Value="newSurvey!.EndDate" />
+    </div> *@
+@*     <div class="mb-3">
         <label for="status" class="form-label">Status</label>
-        <InputSelect id="status" class="form-control" @bind-Value="newSurvey.Status">
+        <InputSelect id="status" class="form-control" @bind-Value="newSurvey!.Status">
             @foreach (var status in Enum.GetValues<SurveyStatus>())
             {
                 <option value="@status">@status</option>
             }
         </InputSelect>
-    </div>
-@*     <div class="mb-3">
-        <label for="owner" class="form-label">Owner</label>
-        <InputText id="owner" class="form-control" @bind-Value="newSurvey.Owner.UserName" />
     </div> *@
+
+    <div class="mb-3">
+        <label for="questions" class="form-label">Questions</label>
+        @foreach (var question in newSurvey.Questions)
+        {
+            <div class="mb-3">
+                <InputText class="form-control" @bind-Value="newSurvey!.Questions[0].QuestionText" placeholder="Enter question text" />
+@*                 <button type="button" class="btn btn-danger" @onclick="() => RemoveQuestion(question)">Remove</button>
+ *@            </div>
+        }
+    </div>
+
     <button type="submit" class="btn btn-primary">Create</button>
 </EditForm>
+@*<EditForm FormName="addq" Model="newQuestion" OnValidSubmit="AddQuestion">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="mb-3">
+        <label for="question" class="form-label">Question</label>
+        <InputText id="question" class="form-control" @bind-Value="newQuestion.QuestionText" />
+    </div>
+    <button type="submit" class="btn btn-primary">Add Question</button>
+</EditForm> *@
 
 @code {
-    private SurveySession newSurvey = new SurveySession
+    [SupplyParameterFromForm]
+    private SurveySession newSurvey { get; set; } = new SurveySession
         {
-            StartDate = DateTime.Now.AddDays(1),
-            EndDate = DateTime.Now.AddDays(7),
-            Status = SurveyStatus.Concept,
-            //Owner = new User { UserName = "defaultUser" } 
+            Name = "",
+            Questions = new List<SurveyQuestion>()
+            {
+                new SurveyQuestion { }
+            }
         };
+
+    private SurveyQuestion newQuestion = new SurveyQuestion
+    {
+        QuestionText = string.Empty
+    };
+
+    [Inject]
+    private AuthenticationStateProvider AuthenticationStateProvider { get; set; }
+
+    private Modal modal = default!;
+
+
+    // private void AddQuestion()
+    // {
+    //     if (!string.IsNullOrWhiteSpace(newQuestion.QuestionText))
+    //     {
+    //         newSurvey.Questions.Add(new SurveyQuestion { Id = Guid.NewGuid(), QuestionText = newQuestion.QuestionText });
+    //         newQuestion.QuestionText = string.Empty;
+    //     }
+    // }
+
+    private void RemoveQuestion(SurveyQuestion question)
+    {
+        newSurvey.Questions.Remove(question);
+    }
 
     private async Task HandleValidSubmit()
     {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        newSurvey.StartDate = DateTime.Now.AddYears(1);
+        newSurvey.EndDate = DateTime.Now.AddYears(1);
+        newSurvey.Status = SurveyStatus.Concept;
+        newSurvey.OwnerId = "d86da734-6db3-4b23-849a-4e70fbff9e14";
         await SurveyService.CreateSurvey(newSurvey);
         NavigationManager.NavigateTo("/survey-list");
     }

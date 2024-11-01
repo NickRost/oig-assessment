@@ -2,6 +2,7 @@
 @using OIG.Survey.BLL.Services
 @using OIG.Survey.DLL.Models
 @attribute [StreamRendering]
+@rendermode InteractiveServer
 
 <PageTitle>Surveys</PageTitle>
 
@@ -9,15 +10,16 @@
 
 <p>This component demonstrates showing survey data.</p>
 
-@if (surveys != null )
+@if (surveys == null )
 {
     <p><em>Loading...</em></p>
 }
 else
 {
-    <table class="table">
+@*     <table class="table">
         <thead>
             <tr>
+                <th>Name</th>
                 <th>Start Date</th>
                 <th>End Date</th>
                 <th>Status</th>
@@ -25,44 +27,71 @@ else
                 <th>Actions</th>
             </tr>
         </thead>
-        @* <tbody>
+        <tbody>
             @foreach (var survey in surveys)
             {
                 <tr>
-                    <td>@survey.StartDate.ToShortDateString()</td>
-                    <td>@survey.EndDate.ToShortDateString()</td>
+                    <td>@survey.Name</td>
+                    <td>@survey.StartDate</td>
+                    <td>@survey.EndDate</td>
                     <td>@survey.Status</td>
                     <td>@survey.Owner.UserName</td>
                     <td>
-                        <button class="btn btn-primary" @onclick="() => EditSurvey(survey.Id)">Edit</button>
-                        <button class="btn btn-danger" @onclick="() => DeleteSurvey(survey.Id)">Delete</button>
-                    </td>
-                </tr>
-            }
-        </tbody> *@
-        <tbody>
-            {
-                <tr>
-                    <td>test</td>
-                    <td>test</td>
-                    <td>test</td>
-                    <td>test</td>
-                    <td>
-                        <button class="btn btn-primary" @onclick="() => EditSurvey()">Edit</button>
-                        <button class="btn btn-danger">Delete</button>
+                        <button class="btn btn-primary" @onclick="() => EditSurvey(survey)">Edit</button>
+                        <button class="btn btn-danger" @onclick="() => DeleteSurvey(survey.Id)">Delete</button> 
                     </td>
                 </tr>
             }
         </tbody>
-    </table>
+    </table> *@
+
+    <Grid TItem="SurveySession"
+          Class="table table-hover table-bordered table-striped"
+          AllowRowClick="true"
+          DataProvider="EmployeesDataProvider"
+          AllowFiltering="true"
+          AllowPaging="true"
+          PageSize="10"
+          AllowSorting="true"
+          AllowSelection="true"
+          OnRowClick="OnRowClick"
+          Responsive="true">
+
+        <GridColumns>
+            <GridColumn TItem="SurveySession" HeaderText="Name" PropertyName="Name" SortString="Name" SortKeySelector="item => item.Name">
+                @context.Name
+            </GridColumn>
+
+            <GridColumn TItem="SurveySession" HeaderText="StartDate" PropertyName="StartDate" SortKeySelector="item => item.StartDate">
+                @context.StartDate
+            </GridColumn>
+
+            <GridColumn TItem="SurveySession" HeaderText="EndDate" PropertyName="EndDate" SortKeySelector="item => item.EndDate">
+                @context.EndDate
+            </GridColumn>
+
+            <GridColumn TItem="SurveySession" HeaderText="Status" PropertyName="Status" >
+                @context.Status
+            </GridColumn>
+            <GridColumn TItem="SurveySession" HeaderText="UserName" Filterable="false" PropertyName="UserName" SortString="UserName" SortKeySelector="item => item.Owner.UserName">
+                @context.Owner.UserName
+            </GridColumn>
+        </GridColumns>
+
+    </Grid>
+
 }
 
-<EditSurveyModal @ref="editSurveyModal" Survey="selectedSurvey" OnClose="ReloadSurveys" />
+<Modal @ref="modal2" Title="Modal title">
+    <BodyTemplate>
+        Modal body text goes here.
+    </BodyTemplate>
+</Modal>
+
 
 @code {
     private List<SurveySession>? surveys;
     private SurveySession? selectedSurvey;
-    private EditSurveyModal? editSurveyModal;
 
     [Inject]
     private SurveyService SurveyService { get; set; }
@@ -75,11 +104,6 @@ else
         surveys = await SurveyService.GetSurveys();
     }
 
-    private void EditSurvey()
-    {
-        selectedSurvey = null;
-        editSurveyModal?.ShowModal();
-    }
 
     private async Task DeleteSurvey(Guid id)
     {
@@ -95,5 +119,38 @@ else
     {
         surveys = await SurveyService.GetSurveys();
         StateHasChanged();
+    }
+
+    private Modal modal = default!;
+    private Modal modal2 = default!;
+
+    private async Task OnShowModalClick()
+    {
+        await modal2.ShowAsync();
+    }
+
+    private async Task OnHideModalClick()
+    {
+        await modal2.HideAsync();
+    }
+
+    [Parameter]
+    public SurveySession Survey { get; set; }
+
+    private async Task<GridDataProviderResult<SurveySession>> EmployeesDataProvider(GridDataProviderRequest<SurveySession> request)
+    {
+        if (surveys is null) // pull employees only one time for client-side filtering, sorting, and paging
+            surveys = await SurveyService.GetSurveys(); // call a service or an API to pull the employees
+
+        return await Task.FromResult(request.ApplyTo(surveys));
+    }
+
+    private async Task OnRowClick(GridRowEventArgs<SurveySession> args)
+    {
+        Dictionary<string, object> dictionary = new Dictionary<string, object>();
+        var parameters = dictionary;
+        parameters.Add("SurveyId", args.Item.Id);
+        parameters.Add("OnclickCallback", EventCallback.Factory.Create<MouseEventArgs>(this, OnHideModalClick));
+        await modal2.ShowAsync<EmployeeDemoComponent1>("Employee Details", null, parameters);
     }
 }

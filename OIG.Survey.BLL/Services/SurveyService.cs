@@ -20,16 +20,52 @@ namespace OIG.Survey.BLL.Services
 
         public async Task<List<SurveySession>> GetSurveys()
         {
-            return await _surveyContext.SurveySessions.ToListAsync();
+            return await _surveyContext.SurveySessions
+                .Include(s => s.Owner)
+                .Include(s => s.AssignedUser)
+                .ToListAsync();
+        }
+
+        public async Task<List<SurveySession>> GetSurveysAssignedToUser(string userId)
+        {
+            return await _surveyContext.SurveySessions
+                .Where(s => s.AssignedUserId == userId)
+                .Include(s => s.Questions)
+                .Include(s => s.Owner)
+                .ToListAsync();
+        }
+
+        public async Task SubmitAnswer(UserAnswer userAnswer)
+        {
+            _surveyContext.UserAnswers.Add(userAnswer);
+            await _surveyContext.SaveChangesAsync();
+        }
+
+        public async Task<List<SurveySession>> GetSurveysByAssignedUserEmail(string email)
+        {
+            return await _surveyContext.SurveySessions
+                .Where(s => s.AssignedUser.Email == email)
+                .Include(s => s.Questions)
+                .Include(s => s.Owner)
+                .Include(s => s.AssignedUser)
+                .ToListAsync();
         }
 
         public async Task<SurveySession> GetSurveyById(Guid id)
         {
-            return await _surveyContext.SurveySessions.FindAsync(id);
+            return await _surveyContext.SurveySessions
+                .Include(s => s.Owner)
+                .Include(s => s.AssignedUser)
+                .FirstOrDefaultAsync(s => s.Id == id);
         }
 
         public async Task CreateSurvey(SurveySession survey)
         {
+            if (survey.StartDate < DateTime.Now)
+            {
+                throw new Exception("Start date cannot be in the past.");
+            }
+
             _surveyContext.SurveySessions.Add(survey);
             await _surveyContext.SaveChangesAsync();
         }
@@ -57,12 +93,15 @@ namespace OIG.Survey.BLL.Services
 
         public async Task<bool> DeleteSurvey(Guid id)
         {
-            var survey = await _surveyContext.SurveySessions.FindAsync(id);
+            var survey = await _surveyContext.SurveySessions
+                .Include(s => s.Questions)
+                .FirstOrDefaultAsync(s => s.Id == id);
             if (survey == null)
             {
                 return false;
             }
 
+            _surveyContext.SurveyQuestion.RemoveRange(survey.Questions);
             _surveyContext.SurveySessions.Remove(survey);
             await _surveyContext.SaveChangesAsync();
             return true;

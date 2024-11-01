@@ -1,7 +1,43 @@
 ﻿@page "/"
 
+@using Microsoft.AspNetCore.Components.Web
+
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<div class="container mt-5">
+    <div class="jumbotron text-center">
+        <h1 class="display-4">Survey App</h1>
+        <p class="lead">Welcome to the Survey App, your go-to solution for creating and managing surveys effortlessly.</p>
+        <hr class="my-4">
+        <p>With our app, you can easily schedule surveys, assign users, and track responses in real-time.</p>
+        <a class="btn btn-primary btn-lg" href="/schedule-survey" role="button">Get Started</a>
+    </div>
 
-Welcome to your new app.
+    <div class="row mt-5">
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Create Surveys</h5>
+                    <p class="card-text">Design and create surveys with a variety of question types to gather the information you need.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Schedule Surveys</h5>
+                    <p class="card-text">Schedule surveys to be sent out at specific times and assign them to users for completion.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Analyze Results</h5>
+                    <p class="card-text">Analyze survey results with our built-in analytics tools to gain valuable insights.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

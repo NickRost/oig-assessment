@@ -1,0 +1,122 @@
+﻿@page "/schedule-survey"
+@using Microsoft.AspNetCore.Authorization
+@using OIG.Survey.BLL.Services
+@using OIG.Survey.DLL.Models
+@inject SurveyService SurveyService
+@inject UserService UserService
+@inject NavigationManager NavigationManager
+@rendermode InteractiveServer
+
+@attribute [Authorize]
+
+<PageTitle>Schedule Survey</PageTitle>
+
+<h1>Schedule Survey</h1>
+
+<EditForm Model="scheduleModel" OnValidSubmit="HandleValidSubmit">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label for="survey" class="form-label">Select Survey</label>
+        <InputSelect id="survey" class="form-control" @bind-Value="scheduleModel.SurveyId">
+            @foreach (var survey in surveys)
+            {
+                <option value="@survey.Id">@survey.Name</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="mb-3">
+        <label for="assignedUser" class="form-label">Assign User</label>
+        <InputSelect id="assignedUser" class="form-control" @bind-Value="scheduleModel.AssignedUserId">
+            @foreach (var user in users)
+            {
+                <option value="@user.Id">@user.UserName</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="mb-3">
+        <label for="startDate" class="form-label">Start Date</label>
+        <InputDate Type="InputDateType.DateTimeLocal" id="startDate" class="form-control" @bind-Value="scheduleModel.StartDate" />
+        <ValidationMessage For="@(() => scheduleModel.StartDate)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="endDate" class="form-label">End Date</label>
+        <InputDate Type="InputDateType.DateTimeLocal" id="endDate" class="form-control" @bind-Value="scheduleModel.EndDate" />
+        <ValidationMessage For="@(() => scheduleModel.EndDate)" />
+    </div>
+
+    @if (showStartDateError)
+    {
+        <div class="text-danger">Start Date cannot be earlier than the current date.</div>
+    }
+
+    @if (showEndDateError)
+    {
+        <div class="text-danger">End Date cannot be earlier than the Start Date.</div>
+    }
+
+    <button type="submit" class="btn btn-primary">Schedule</button>
+</EditForm>
+
+@code {
+    private List<SurveySession> surveys = new List<SurveySession>();
+    private List<ApplicationUser> users = new List<ApplicationUser>();
+    private ScheduleModel scheduleModel = new ScheduleModel();
+    private bool showStartDateError = false;
+    private bool showEndDateError = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        surveys = await SurveyService.GetSurveys();
+        users = await UserService.GetUsers();
+        if (surveys.Any())
+        {
+            scheduleModel.SurveyId = surveys.First().Id;
+        }
+        if (users.Any())
+        {
+            scheduleModel.AssignedUserId = users.First().Id;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        showStartDateError = false;
+        showEndDateError = false;
+
+        if (scheduleModel.StartDate < DateTime.Now)
+        {
+            showStartDateError = true;
+            return;
+        }
+
+        if (scheduleModel.EndDate < scheduleModel.StartDate)
+        {
+            showEndDateError = true;
+            return;
+        }
+
+        var survey = surveys.FirstOrDefault(s => s.Id == scheduleModel.SurveyId);
+        if (survey != null)
+        {
+            survey.StartDate = scheduleModel.StartDate;
+            survey.EndDate = scheduleModel.EndDate;
+            survey.Status = SurveyStatus.Scheduled;
+            survey.AssignedUserId = scheduleModel.AssignedUserId;
+            await SurveyService.UpdateSurvey(survey);
+            NavigationManager.NavigateTo("/survey-list");
+        }
+    }
+
+    private class ScheduleModel
+    {
+        public Guid SurveyId { get; set; }
+        public string AssignedUserId { get; set; }
+        public DateTime StartDate { get; set; } = DateTime.Now;
+        public DateTime EndDate { get; set; } = DateTime.Now;
+    }
+}
